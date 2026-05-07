@@ -1,20 +1,20 @@
 'use strict';
 
 const currentTimeEl = document.getElementById('current-time');
+const currentDateEl = document.getElementById('current-date');
 const alarmTimeInput = document.getElementById('alarm-time');
 const alarmLabelInput = document.getElementById('alarm-label');
 const addBtn = document.getElementById('add-btn');
 const alarmsList = document.getElementById('alarms');
-const emptyMsg = document.getElementById('empty-msg');
+const emptyState = document.getElementById('empty-state');
 
 let alarms = loadAlarms();
 let audioCtx = null;
 let ringIntervals = {};
 
-// ── Clock ──────────────────────────────────────────────
-function pad(n) {
-  return String(n).padStart(2, '0');
-}
+const DAYS = ['日', '月', '火', '水', '木', '金', '土'];
+
+function pad(n) { return String(n).padStart(2, '0'); }
 
 function tickClock() {
   const now = new Date();
@@ -22,28 +22,27 @@ function tickClock() {
   const mm = pad(now.getMinutes());
   const ss = pad(now.getSeconds());
   currentTimeEl.textContent = `${hh}:${mm}:${ss}`;
+
+  const y = now.getFullYear();
+  const mo = now.getMonth() + 1;
+  const d = now.getDate();
+  const day = DAYS[now.getDay()];
+  currentDateEl.textContent = `${y}年${mo}月${d}日（${day}）`;
+
   checkAlarms(now);
 }
 
 setInterval(tickClock, 1000);
 tickClock();
 
-// ── Alarm check ────────────────────────────────────────
 function checkAlarms(now) {
-  const hh = pad(now.getHours());
-  const mm = pad(now.getMinutes());
-  const currentHHMM = `${hh}:${mm}`;
-
+  const currentHHMM = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
   alarms.forEach((alarm) => {
-    if (!alarm.enabled) return;
-    if (alarm.time !== currentHHMM) return;
-    if (ringIntervals[alarm.id]) return; // already ringing
-
-    startRinging(alarm.id);
+    if (!alarm.enabled || ringIntervals[alarm.id]) return;
+    if (alarm.time === currentHHMM) startRinging(alarm.id);
   });
 }
 
-// ── Audio (Web Audio API ベル音) ───────────────────────
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   return audioCtx;
@@ -53,17 +52,13 @@ function playBeep() {
   const ctx = getAudioCtx();
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
-
   osc.connect(gain);
   gain.connect(ctx.destination);
-
   osc.type = 'sine';
   osc.frequency.setValueAtTime(880, ctx.currentTime);
   osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.4);
-
   gain.gain.setValueAtTime(0.4, ctx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-
   osc.start(ctx.currentTime);
   osc.stop(ctx.currentTime + 0.5);
 }
@@ -72,12 +67,9 @@ function startRinging(id) {
   playBeep();
   ringIntervals[id] = setInterval(playBeep, 900);
   renderAlarms();
-
   if ('Notification' in window && Notification.permission === 'granted') {
     const alarm = alarms.find((a) => a.id === id);
-    new Notification('⏰ アラーム！', {
-      body: alarm?.label || '設定時刻になりました',
-    });
+    new Notification('⏰ アラーム！', { body: alarm?.label || '設定時刻になりました' });
   }
 }
 
@@ -87,16 +79,11 @@ function stopRinging(id) {
   renderAlarms();
 }
 
-// ── Alarm CRUD ─────────────────────────────────────────
 function addAlarm() {
   const time = alarmTimeInput.value;
-  if (!time) {
-    alarmTimeInput.focus();
-    return;
-  }
+  if (!time) { alarmTimeInput.focus(); return; }
   const label = alarmLabelInput.value.trim();
-  const alarm = { id: Date.now(), time, label, enabled: true };
-  alarms.push(alarm);
+  alarms.push({ id: Date.now(), time, label, enabled: true });
   alarms.sort((a, b) => a.time.localeCompare(b.time));
   saveAlarms();
   renderAlarms();
@@ -119,16 +106,16 @@ function toggleAlarm(id) {
   renderAlarms();
 }
 
-// ── Render ─────────────────────────────────────────────
 function renderAlarms() {
   alarmsList.innerHTML = '';
-  emptyMsg.style.display = alarms.length ? 'none' : 'block';
+  emptyState.style.display = alarms.length ? 'none' : 'block';
 
   alarms.forEach((alarm) => {
     const isRinging = !!ringIntervals[alarm.id];
-
     const li = document.createElement('li');
-    li.className = 'alarm-item' + (isRinging ? ' ringing' : '');
+    li.className = 'alarm-item' +
+      (isRinging ? ' ringing' : '') +
+      (!alarm.enabled ? ' disabled-item' : '');
 
     li.innerHTML = `
       <div class="alarm-info">
@@ -136,54 +123,37 @@ function renderAlarms() {
         ${alarm.label ? `<span class="alarm-label-text">${escHtml(alarm.label)}</span>` : ''}
       </div>
       <div class="alarm-actions">
-        ${isRinging ? `<button class="dismiss-btn" data-id="${alarm.id}">止める</button>` : ''}
+        ${isRinging ? `<button class="dismiss-btn" data-id="${alarm.id}">止める 🔕</button>` : ''}
         <label class="toggle-switch">
           <input type="checkbox" ${alarm.enabled ? 'checked' : ''} data-id="${alarm.id}" class="toggle-input" />
           <span class="slider"></span>
         </label>
         <button class="delete-btn" data-id="${alarm.id}" title="削除">✕</button>
-      </div>
-    `;
+      </div>`;
 
     alarmsList.appendChild(li);
   });
 
-  alarmsList.querySelectorAll('.dismiss-btn').forEach((btn) => {
-    btn.addEventListener('click', () => stopRinging(Number(btn.dataset.id)));
-  });
-
-  alarmsList.querySelectorAll('.toggle-input').forEach((chk) => {
-    chk.addEventListener('change', () => toggleAlarm(Number(chk.dataset.id)));
-  });
-
-  alarmsList.querySelectorAll('.delete-btn').forEach((btn) => {
-    btn.addEventListener('click', () => deleteAlarm(Number(btn.dataset.id)));
-  });
+  alarmsList.querySelectorAll('.dismiss-btn').forEach((btn) =>
+    btn.addEventListener('click', () => stopRinging(Number(btn.dataset.id))));
+  alarmsList.querySelectorAll('.toggle-input').forEach((chk) =>
+    chk.addEventListener('change', () => toggleAlarm(Number(chk.dataset.id))));
+  alarmsList.querySelectorAll('.delete-btn').forEach((btn) =>
+    btn.addEventListener('click', () => deleteAlarm(Number(btn.dataset.id))));
 }
 
 function escHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-// ── Persistence ────────────────────────────────────────
-function saveAlarms() {
-  localStorage.setItem('simple-alarms', JSON.stringify(alarms));
-}
-
+function saveAlarms() { localStorage.setItem('simple-alarms', JSON.stringify(alarms)); }
 function loadAlarms() {
-  try {
-    return JSON.parse(localStorage.getItem('simple-alarms')) || [];
-  } catch {
-    return [];
-  }
+  try { return JSON.parse(localStorage.getItem('simple-alarms')) || []; }
+  catch { return []; }
 }
 
-// ── Init ───────────────────────────────────────────────
 addBtn.addEventListener('click', addAlarm);
 alarmTimeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addAlarm(); });
-
-if ('Notification' in window && Notification.permission === 'default') {
-  Notification.requestPermission();
-}
+if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
 
 renderAlarms();

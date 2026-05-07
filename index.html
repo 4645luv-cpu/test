@@ -7,29 +7,46 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="bg-orbs">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+  </div>
+
   <div class="container">
     <header>
-      <h1>⏰ シンプルアラーム</h1>
+      <div class="logo">⏰</div>
+      <h1>シンプルアラーム</h1>
       <div id="current-time" class="current-time">--:--:--</div>
+      <div id="current-date" class="current-date"></div>
     </header>
 
-    <section class="set-alarm">
-      <h2>アラームを追加</h2>
+    <section class="card set-alarm">
+      <h2><span class="section-icon">＋</span> アラームを追加</h2>
       <div class="input-group">
-        <input type="time" id="alarm-time" />
-        <input type="text" id="alarm-label" placeholder="ラベル（任意）" maxlength="30" />
-        <button id="add-btn">追加</button>
+        <div class="input-wrap">
+          <label>時刻</label>
+          <input type="time" id="alarm-time" />
+        </div>
+        <div class="input-wrap flex1">
+          <label>ラベル（任意）</label>
+          <input type="text" id="alarm-label" placeholder="例：朝の薬、会議..." maxlength="30" />
+        </div>
+        <button id="add-btn"><span>追加</span></button>
       </div>
     </section>
 
-    <section class="alarm-list">
-      <h2>アラーム一覧</h2>
+    <section class="card alarm-list">
+      <h2><span class="section-icon">🔔</span> アラーム一覧</h2>
       <ul id="alarms"></ul>
-      <p id="empty-msg" class="empty-msg">アラームが登録されていません</p>
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">🌙</div>
+        <p>アラームが登録されていません</p>
+        <p class="empty-sub">上のフォームから追加しましょう</p>
+      </div>
     </section>
   </div>
 
-  <!-- 通知音用の AudioContext ベルを JS で生成するので音声ファイル不要 -->
   <script src="app.js"></script>
 </body>
 </html>
