@@ -1,0 +1,250 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  background: #0f0f1a;
+  color: #e0e0f0;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Header ── */
+header {
+  text-align: center;
+}
+
+header h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #a78bfa;
+}
+
+.current-time {
+  font-size: 3.5rem;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: #f0f0ff;
+  margin-top: 0.4rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Set Alarm ── */
+.set-alarm,
+.alarm-list {
+  background: #1a1a2e;
+  border: 1px solid #2e2e4e;
+  border-radius: 16px;
+  padding: 1.4rem 1.6rem;
+}
+
+.set-alarm h2,
+.alarm-list h2 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #818cf8;
+  margin-bottom: 1rem;
+}
+
+.input-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.input-group input[type="time"] {
+  flex: 0 0 auto;
+  padding: 0.55rem 0.8rem;
+  background: #0f0f1a;
+  border: 1px solid #3b3b5e;
+  border-radius: 8px;
+  color: #f0f0ff;
+  font-size: 1.1rem;
+  color-scheme: dark;
+}
+
+.input-group input[type="text"] {
+  flex: 1 1 120px;
+  padding: 0.55rem 0.8rem;
+  background: #0f0f1a;
+  border: 1px solid #3b3b5e;
+  border-radius: 8px;
+  color: #f0f0ff;
+  font-size: 0.95rem;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #818cf8;
+}
+
+.input-group button {
+  padding: 0.55rem 1.4rem;
+  background: #6d28d9;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.input-group button:hover {
+  background: #7c3aed;
+}
+
+/* ── Alarm List ── */
+#alarms {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.alarm-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #0f0f1a;
+  border: 1px solid #2e2e4e;
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+
+.alarm-item.ringing {
+  border-color: #f59e0b;
+  animation: pulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3); }
+  to   { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+}
+
+.alarm-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.alarm-time-text {
+  font-size: 1.5rem;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  color: #f0f0ff;
+}
+
+.alarm-label-text {
+  font-size: 0.8rem;
+  color: #818cf8;
+}
+
+.alarm-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: #2e2e4e;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.toggle-switch input:checked + .slider {
+  background: #6d28d9;
+}
+
+.toggle-switch input:checked + .slider::before {
+  transform: translateX(18px);
+}
+
+.delete-btn {
+  background: none;
+  border: 1px solid #3b3b5e;
+  border-radius: 6px;
+  color: #818cf8;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.delete-btn:hover {
+  background: #3b1e6e;
+  color: #fff;
+  border-color: #6d28d9;
+}
+
+.dismiss-btn {
+  padding: 0.3rem 0.7rem;
+  background: #f59e0b;
+  border: none;
+  border-radius: 6px;
+  color: #000;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dismiss-btn:hover {
+  background: #d97706;
+}
+
+.empty-msg {
+  text-align: center;
+  color: #4a4a6a;
+  font-size: 0.9rem;
+  padding: 1rem 0;
+}
