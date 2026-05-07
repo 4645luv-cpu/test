@@ -3,50 +3,255 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>シンプルアラーム</title>
+  <title>Wedding Invitation | Kazuki &amp; Yume</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Noto+Serif+JP:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="bg-orbs">
-    <div class="orb orb1"></div>
-    <div class="orb orb2"></div>
-    <div class="orb orb3"></div>
+
+  <nav class="navbar">
+    <div class="nav-logo">
+      <svg width="36" height="28" viewBox="0 0 36 28" fill="none">
+        <circle cx="11" cy="7" r="5.5" fill="#8B2E2E"/>
+        <circle cx="21" cy="7" r="5.5" fill="#8B2E2E"/>
+        <line x1="11" y1="12.5" x2="11" y2="26" stroke="#8B2E2E" stroke-width="2"/>
+        <line x1="21" y1="12.5" x2="21" y2="26" stroke="#8B2E2E" stroke-width="2"/>
+        <line x1="9"  y1="26"   x2="23" y2="26"  stroke="#8B2E2E" stroke-width="2"/>
+      </svg>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#home">HOME</a></li>
+      <li><a href="#about">ABOUT US</a></li>
+      <li><a href="#details">DETAILS</a></li>
+      <li><a href="#rsvp">RSVP</a></li>
+      <li><a href="#gallery">GALLERY</a></li>
+      <li><a href="#qa">Q&amp;A</a></li>
+    </ul>
+    <a href="#rsvp" class="nav-rsvp-btn">RSVPする ✉</a>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#home"    onclick="closeMobile()">HOME</a>
+    <a href="#about"   onclick="closeMobile()">ABOUT US</a>
+    <a href="#details" onclick="closeMobile()">DETAILS</a>
+    <a href="#rsvp"    onclick="closeMobile()">RSVP</a>
+    <a href="#gallery" onclick="closeMobile()">GALLERY</a>
+    <a href="#qa"      onclick="closeMobile()">Q&amp;A</a>
   </div>
 
-  <div class="container">
-    <header>
-      <div class="logo">⏰</div>
-      <h1>シンプルアラーム</h1>
-      <div id="current-time" class="current-time">--:--:--</div>
-      <div id="current-date" class="current-date"></div>
-    </header>
-
-    <section class="card set-alarm">
-      <h2><span class="section-icon">＋</span> アラームを追加</h2>
-      <div class="input-group">
-        <div class="input-wrap">
-          <label>時刻</label>
-          <input type="time" id="alarm-time" />
+  <section id="home" class="hero">
+    <div class="deco deco-glass" aria-hidden="true">
+      <svg width="48" height="86" viewBox="0 0 48 86" fill="none" stroke="#8B2E2E" stroke-width="1.4" stroke-linecap="round">
+        <path d="M8 4 L40 4 L31 44 L17 44 Z"/>
+        <line x1="24" y1="44" x2="24" y2="72"/>
+        <line x1="12" y1="72" x2="36" y2="72"/>
+        <path d="M7 18 Q4 26 7 34"/>
+      </svg>
+    </div>
+    <div class="deco deco-cake" aria-hidden="true">
+      <svg width="52" height="68" viewBox="0 0 52 68" fill="none" stroke="#8B2E2E" stroke-width="1.4" stroke-linecap="round">
+        <rect x="4"  y="34" width="44" height="28" rx="3"/>
+        <rect x="11" y="20" width="30" height="16" rx="2"/>
+        <rect x="18" y="8"  width="16" height="14" rx="2"/>
+        <line x1="26" y1="4" x2="26" y2="0"/>
+        <path d="M21 46 Q26 38 31 46"/>
+      </svg>
+    </div>
+    <div class="hero-content">
+      <div class="hero-text reveal">
+        <h1 class="hero-h1">
+          <span class="h1-wedding">Wedding <span class="h1-dot">♡</span></span>
+          <span class="h1-invitation">Invitation</span>
+        </h1>
+        <h2 class="hero-names">Kazuki &amp; Yume</h2>
+        <p class="hero-dots">· · ♡ · ·</p>
+        <p class="hero-msg">
+          何気ない日々を、これからもふたりで。<br />
+          大切な皆さまに見守っていただきたく、<br />
+          ささやかな結婚式を行います。
+        </p>
+        <div class="hero-btns">
+          <a href="#rsvp"    class="btn-solid">RSVPする ♡</a>
+          <a href="#details" class="btn-outline">詳細を見る →</a>
         </div>
-        <div class="input-wrap flex1">
-          <label>ラベル（任意）</label>
-          <input type="text" id="alarm-label" placeholder="例：朝の薬、会議..." maxlength="30" />
+      </div>
+      <div class="hero-photo-wrap reveal reveal-delay">
+        <div class="photo-frame">
+          <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=420&h=520&fit=crop&crop=faces" alt="ふたりの写真" class="hero-img" />
+          <span class="photo-cap">ふたりの写真</span>
+          <span class="fh fh1">♡</span><span class="fh fh2">♡</span>
+          <span class="fh fh3">♡</span><span class="fh fh4">♡</span>
         </div>
-        <button id="add-btn"><span>追加</span></button>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="card alarm-list">
-      <h2><span class="section-icon">🔔</span> アラーム一覧</h2>
-      <ul id="alarms"></ul>
-      <div id="empty-state" class="empty-state">
-        <div class="empty-icon">🌙</div>
-        <p>アラームが登録されていません</p>
-        <p class="empty-sub">上のフォームから追加しましょう</p>
+  <section id="about" class="about">
+    <div class="about-flower" aria-hidden="true">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#8B2E2E" stroke-width="1.2">
+        <circle cx="24" cy="24" r="4.5"/>
+        <ellipse cx="24" cy="9" rx="3.5" ry="7.5"/><ellipse cx="24" cy="39" rx="3.5" ry="7.5"/>
+        <ellipse cx="9" cy="24" rx="7.5" ry="3.5"/><ellipse cx="39" cy="24" rx="7.5" ry="3.5"/>
+        <ellipse cx="13" cy="13" rx="3.5" ry="7.5" transform="rotate(45 13 13)"/>
+        <ellipse cx="35" cy="35" rx="3.5" ry="7.5" transform="rotate(45 35 35)"/>
+        <ellipse cx="35" cy="13" rx="3.5" ry="7.5" transform="rotate(-45 35 13)"/>
+        <ellipse cx="13" cy="35" rx="3.5" ry="7.5" transform="rotate(-45 13 35)"/>
+      </svg>
+    </div>
+    <div class="sec-head">
+      <p class="hearts-row">♡ ♡ ♡</p>
+      <h2 class="sec-title fancy">About Us</h2>
+      <p class="sec-sub">ふたりのことを、少しだけ。</p>
+      <div class="sec-line"></div>
+    </div>
+    <div class="about-cards">
+      <div class="person-card reveal">
+        <div class="pcol"><div class="pframe"><img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=220&h=280&fit=crop&crop=face" alt="Yume" class="pimg" /></div><span class="pbow">🎀</span></div>
+        <div class="pinfo">
+          <h3 class="pname">Yume</h3><p class="prole fancy">Bride</p>
+          <ul class="plist">
+            <li><span class="picon blue">♡</span><div><strong>第一印象</strong>感情の動きや小さなときめきを大切にする、まっすぐであたたかい人。</div></li>
+            <li><span class="picon">🍴</span><div><strong>好きな食べ物</strong>おいしいもの全般。チルできる時間に合うごはんや甸いもの。</div></li>
+            <li><span class="picon blue">♡</span><div><strong>好きな言葉</strong>好きな人と、何気ない毎日をちゃんと重ねていくこと。</div></li>
+          </ul>
+        </div>
+        <p class="card-hearts">♡ ♡ ♡</p>
       </div>
-    </section>
-  </div>
+      <div class="person-card reveal">
+        <div class="pcol"><div class="pframe"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=220&h=280&fit=crop&crop=face" alt="Kazuki" class="pimg" /></div><span class="pbow">🎀</span></div>
+        <div class="pinfo">
+          <h3 class="pname">Kazuki</h3><p class="prole fancy">Groom</p>
+          <ul class="plist">
+            <li><span class="picon blue">♡</span><div><strong>第一印象</strong>自然体でテンポが合い、一緒にいると安心できる人。</div></li>
+            <li><span class="picon">🍴</span><div><strong>好きな食べ物</strong>一緒に食べるごはん、旅先や日常の中で見つけるおいしいもの。</div></li>
+            <li><span class="picon blue">♡</span><div><strong>好きな言葉</strong>挑戦すること、続けること、そして大切な人を大切にすること。</div></li>
+          </ul>
+        </div>
+        <p class="card-hearts">♡ ♡ ♡</p>
+      </div>
+    </div>
+  </section>
 
-  <script src="app.js"></script>
+  <section id="details" class="details">
+    <div class="details-grid">
+      <div class="dcard reveal">
+        <span class="dc-corner tl"></span><span class="dc-corner tr"></span>
+        <span class="dc-corner bl"></span><span class="dc-corner br"></span>
+        <h3 class="dc-title fancy">Date</h3>
+        <p class="dc-date">2027年 ○月 ○日</p>
+        <p class="dc-div">——— ♡ ———</p>
+        <p class="dc-time">受付 10:30 / 挙式 11:00</p>
+      </div>
+      <div class="details-photo-wrap reveal">
+        <div class="tape"></div>
+        <img src="https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=400&h=280&fit=crop" alt="思い出の写真" class="dp-img" />
+        <p class="dp-cap">思い出の写真 ♡</p>
+      </div>
+      <div class="dcard reveal">
+        <span class="dc-corner tl"></span><span class="dc-corner tr"></span>
+        <span class="dc-corner bl"></span><span class="dc-corner br"></span>
+        <h3 class="dc-title fancy">Place</h3>
+        <p class="dc-venue">会場名を入力</p>
+        <p class="dc-addr">東京都 ○○区 ○○</p>
+        <div class="dc-icon">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="#8B2E2E" stroke-width="1.5">
+            <path d="M3 15 L17 3 L31 15 L31 31 L3 31 Z"/>
+            <rect x="12" y="21" width="10" height="10"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery" class="gallery">
+    <div class="sec-head">
+      <p class="hearts-row">♡ ♡ ♡</p>
+      <h2 class="sec-title fancy">Gallery</h2>
+      <p class="sec-sub">ふたりの思い出。</p>
+      <div class="sec-line"></div>
+    </div>
+    <div class="slider-wrap">
+      <button class="sl-btn sl-prev" id="slPrev" aria-label="前へ">&#8249;</button>
+      <div class="sl-viewport" id="slViewport">
+        <div class="sl-track" id="slTrack">
+          <div class="sl-slide"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=420&h=300&fit=crop" alt="Photo 1" /><span class="sl-heart">♡</span></div>
+          <div class="sl-slide"><img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=420&h=300&fit=crop" alt="Photo 2" /><span class="sl-heart">♡</span></div>
+          <div class="sl-slide"><img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=420&h=300&fit=crop" alt="Photo 3" /><span class="sl-heart">♡</span></div>
+          <div class="sl-slide"><img src="https://images.unsplash.com/photo-1529636798458-92182e662485?w=420&h=300&fit=crop" alt="Photo 4" /><span class="sl-heart">♡</span></div>
+          <div class="sl-slide"><img src="https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?w=420&h=300&fit=crop" alt="Photo 5" /><span class="sl-heart">♡</span></div>
+          <div class="sl-slide"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=420&h=300&fit=crop" alt="Photo 6" /><span class="sl-heart">♡</span></div>
+        </div>
+      </div>
+      <button class="sl-btn sl-next" id="slNext" aria-label="次へ">&#8250;</button>
+    </div>
+    <div class="sl-dots" id="slDots"></div>
+  </section>
+
+  <section id="rsvp" class="rsvp">
+    <div class="rsvp-deco rsvp-dl" aria-hidden="true">
+      <svg width="38" height="28" viewBox="0 0 38 28" fill="none" stroke="#8B2E2E" stroke-width="1.4" stroke-linecap="round">
+        <circle cx="11" cy="7" r="5.5"/><circle cx="21" cy="7" r="5.5"/>
+        <line x1="11" y1="12.5" x2="11" y2="26"/><line x1="21" y1="12.5" x2="21" y2="26"/>
+        <line x1="9" y1="26" x2="23" y2="26"/>
+      </svg>
+    </div>
+    <div class="rsvp-deco rsvp-dr" aria-hidden="true">
+      <svg width="40" height="76" viewBox="0 0 40 76" fill="none" stroke="#8B2E2E" stroke-width="1.4" stroke-linecap="round">
+        <path d="M6 4 L34 4 L28 40 L12 40 Z"/>
+        <line x1="20" y1="40" x2="20" y2="64"/><line x1="8" y1="64" x2="32" y2="64"/>
+      </svg>
+    </div>
+    <div class="rsvp-deco rsvp-dc" aria-hidden="true">
+      <svg width="50" height="62" viewBox="0 0 50 62" fill="none" stroke="#8B2E2E" stroke-width="1.4" stroke-linecap="round">
+        <rect x="4" y="32" width="42" height="26" rx="2"/>
+        <rect x="10" y="18" width="30" height="16" rx="2"/>
+        <rect x="17" y="6" width="16" height="14" rx="2"/>
+        <line x1="25" y1="2" x2="25" y2="0"/><path d="M20 44 Q25 36 30 44"/>
+      </svg>
+    </div>
+    <div class="rsvp-inner">
+      <div class="sec-head">
+        <h2 class="sec-title fancy">♡ RSVP ♡</h2>
+        <p class="sec-sub">ご出席についてお知らせください。</p>
+      </div>
+      <div class="att-row">
+        <label class="att-btn att-attend" id="attAttend"><input type="radio" name="att" value="attend" checked /> ♡ 出席</label>
+        <label class="att-btn att-absent" id="attAbsent"><input type="radio" name="att" value="absent" /> ○ 欠席</label>
+      </div>
+      <form class="rsvp-form" id="rsvpForm" novalidate>
+        <div class="form-row">
+          <div class="fg"><label class="flabel">お名前</label><input type="text" class="finput" placeholder="例）山田 太郎" required /></div>
+          <div class="fg"><label class="flabel">メールアドレス</label><input type="email" class="finput" placeholder="例）taro.yamada@example.com" required /></div>
+        </div>
+        <div class="fg"><label class="flabel">メッセージ・アレルギーなど</label><textarea class="ftextarea" placeholder="ご自由にご記入ください"></textarea></div>
+        <button type="submit" class="submit-btn">回答を送信する &nbsp;→</button>
+        <p class="form-ok" id="formOk">✓ 送信が完了しました。ありがとうございます！</p>
+      </form>
+    </div>
+  </section>
+
+  <section id="qa" class="qa">
+    <div class="sec-head">
+      <p class="hearts-row">♡ ♡ ♡</p>
+      <h2 class="sec-title fancy">Q &amp; A</h2>
+      <p class="sec-sub">よくあるご質問</p>
+      <div class="sec-line"></div>
+    </div>
+    <div class="qa-list">
+      <div class="qa-item reveal"><div class="qa-q"><span class="qa-badge qb">Q</span><p>服装について教えてください。</p></div><div class="qa-a"><span class="qa-badge ab">A</span><p>平服でお越しください。カジュアルすぎない服装でお願いいたします。</p></div></div>
+      <div class="qa-item reveal"><div class="qa-q"><span class="qa-badge qb">Q</span><p>駐車場はありますか？</p></div><div class="qa-a"><span class="qa-badge ab">A</span><p>会場に駐車場がございます。詳細は後日お知らせいたします。</p></div></div>
+      <div class="qa-item reveal"><div class="qa-q"><span class="qa-badge qb">Q</span><p>お子様の参加は可能ですか？</p></div><div class="qa-a"><span class="qa-badge ab">A</span><p>もちろんです。お子様のご参加も大歓迎です。ご記入の際にお知らせください。</p></div></div>
+      <div class="qa-item reveal"><div class="qa-q"><span class="qa-badge qb">Q</span><p>ご祝儀は必要ですか？</p></div><div class="qa-a"><span class="qa-badge ab">A</span><p>お気持ちだけで十分です。皆さまのご参加が何よりの贈り物です。</p></div></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p class="footer-msg">Thank you for being part of our story.</p>
+    <p class="footer-names fancy">Kazuki &amp; Yume ♡</p>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
