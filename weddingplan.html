@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>挙式当日までのスケジュール｜2027年4月3日</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --pink: #e8a4b8;
@@ -17,9 +18,7 @@
       --white: #fff;
       --shadow: 0 2px 12px rgba(200,140,160,0.13);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', Georgia, serif;
       background: linear-gradient(135deg, #fdf6f9 0%, #f9f2ec 100%);
@@ -27,7 +26,6 @@
       min-height: 100vh;
       padding-bottom: 60px;
     }
-
     header {
       background: linear-gradient(135deg, #fff 60%, var(--pink-light) 100%);
       border-bottom: 2px solid var(--pink-mid);
@@ -38,7 +36,6 @@
       z-index: 100;
       box-shadow: 0 2px 16px rgba(200,140,160,0.12);
     }
-
     header .wedding-date {
       font-size: 13px;
       color: var(--gold);
@@ -46,25 +43,14 @@
       margin-bottom: 6px;
       font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
     }
-
     header h1 {
       font-size: clamp(18px, 4vw, 26px);
       color: var(--text);
       letter-spacing: 0.1em;
       font-weight: 500;
     }
-
-    header .flower {
-      font-size: 22px;
-      margin: 0 8px;
-      vertical-align: middle;
-    }
-
-    .progress-bar-wrap {
-      margin: 16px auto 0;
-      max-width: 400px;
-    }
-
+    header .flower { font-size: 22px; margin: 0 8px; vertical-align: middle; }
+    .progress-bar-wrap { margin: 16px auto 0; max-width: 400px; }
     .progress-label {
       font-size: 12px;
       color: var(--text-sub);
@@ -73,243 +59,158 @@
       display: flex;
       justify-content: space-between;
     }
-
-    .progress-bar {
-      height: 8px;
-      background: var(--pink-mid);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
+    .progress-bar { height: 8px; background: var(--pink-mid); border-radius: 4px; overflow: hidden; }
     .progress-fill {
       height: 100%;
       background: linear-gradient(90deg, var(--pink), var(--gold));
       border-radius: 4px;
       transition: width 0.4s ease;
     }
-
-    main {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 32px 16px 0;
+    .sync-status {
+      font-size: 11px;
+      font-family: sans-serif;
+      margin-top: 8px;
+      height: 16px;
+      color: var(--text-sub);
     }
-
-    .timeline {
-      position: relative;
-    }
-
+    .sync-status.syncing { color: var(--gold); }
+    .sync-status.error { color: #e06060; }
+    main { max-width: 760px; margin: 0 auto; padding: 32px 16px 0; }
+    .timeline { position: relative; }
     .timeline::before {
       content: '';
       position: absolute;
-      left: 22px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
+      left: 22px; top: 0; bottom: 0; width: 2px;
       background: linear-gradient(to bottom, var(--pink-mid), var(--gold-light));
     }
-
-    .period {
-      position: relative;
-      margin-bottom: 36px;
-      padding-left: 56px;
-    }
-
+    .period { position: relative; margin-bottom: 36px; padding-left: 56px; }
     .period-dot {
       position: absolute;
-      left: 12px;
-      top: 4px;
-      width: 22px;
-      height: 22px;
+      left: 12px; top: 4px;
+      width: 22px; height: 22px;
       border-radius: 50%;
       background: var(--white);
       border: 3px solid var(--pink);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      color: var(--pink);
-      z-index: 1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; color: var(--pink); z-index: 1;
     }
-
-    .period-dot.special {
-      border-color: var(--gold);
-      color: var(--gold);
-      background: var(--gold-light);
-    }
-
+    .period-dot.special { border-color: var(--gold); color: var(--gold); background: var(--gold-light); }
     .period-header {
-      font-size: 13px;
-      color: var(--gold);
+      font-size: 13px; color: var(--gold);
       font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      margin-bottom: 10px;
-      padding: 4px 10px;
-      background: var(--gold-light);
-      border-left: 3px solid var(--gold);
-      border-radius: 0 4px 4px 0;
-      display: inline-block;
+      font-weight: 600; letter-spacing: 0.08em;
+      margin-bottom: 10px; padding: 4px 10px;
+      background: var(--gold-light); border-left: 3px solid var(--gold);
+      border-radius: 0 4px 4px 0; display: inline-block;
     }
-
     .section {
-      background: var(--white);
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      margin-bottom: 14px;
-      overflow: hidden;
-      border: 1px solid #f0e4ea;
+      background: var(--white); border-radius: 12px;
+      box-shadow: var(--shadow); margin-bottom: 14px;
+      overflow: hidden; border: 1px solid #f0e4ea;
     }
-
     .section-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display: flex; align-items: center; gap: 8px;
       padding: 12px 16px;
       background: linear-gradient(90deg, var(--pink-light) 0%, var(--white) 100%);
       border-bottom: 1px solid #f0e4ea;
-      cursor: pointer;
-      user-select: none;
+      cursor: pointer; user-select: none;
     }
-
-    .section-title h3 {
-      font-size: 15px;
-      font-weight: 500;
-      flex: 1;
-      color: var(--text);
+    .section-title h3 { font-size: 15px; font-weight: 500; flex: 1; color: var(--text); }
+    .section-title .arrow { font-size: 12px; color: var(--pink); transition: transform 0.2s; }
+    .section-title.open .arrow { transform: rotate(180deg); }
+    .section-progress { font-size: 11px; color: var(--text-sub); font-family: sans-serif; white-space: nowrap; }
+    .section-body { padding: 10px 14px 14px; }
+    .check-item-wrap { margin-bottom: 2px; }
+    .check-item-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      transition: background 0.15s;
     }
-
-    .section-title .arrow {
-      font-size: 12px;
-      color: var(--pink);
-      transition: transform 0.2s;
-    }
-
-    .section-title.open .arrow {
-      transform: rotate(180deg);
-    }
-
-    .section-progress {
-      font-size: 11px;
-      color: var(--text-sub);
-      font-family: sans-serif;
-      white-space: nowrap;
-    }
-
-    .section-body {
-      padding: 10px 14px 14px;
-    }
-
+    .check-item-row:hover { background: var(--pink-light); }
     .check-item {
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      padding: 7px 8px;
-      border-radius: 8px;
-      transition: background 0.15s;
       cursor: pointer;
+      flex: 1;
     }
-
-    .check-item:hover {
-      background: var(--pink-light);
-    }
-
-    .check-item input[type="checkbox"] {
-      display: none;
-    }
-
+    .check-item input[type="checkbox"] { display: none; }
     .check-box {
-      flex-shrink: 0;
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--pink-mid);
-      border-radius: 5px;
+      flex-shrink: 0; width: 20px; height: 20px;
+      border: 2px solid var(--pink-mid); border-radius: 5px;
       background: var(--white);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 1px;
-      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 2px; transition: all 0.2s;
     }
-
     .check-item input:checked ~ .check-box {
-      background: var(--check-green);
-      border-color: var(--check-green);
+      background: var(--check-green); border-color: var(--check-green);
     }
-
     .check-item input:checked ~ .check-box::after {
-      content: '✓';
-      color: white;
-      font-size: 13px;
-      font-weight: bold;
+      content: '✓'; color: white; font-size: 13px; font-weight: bold;
     }
-
-    .check-item.couple input:checked ~ .check-box {
-      background: var(--gold);
-      border-color: var(--gold);
+    .check-item-wrap.couple .check-item input:checked ~ .check-box {
+      background: var(--gold); border-color: var(--gold);
     }
-
-    .check-label {
-      font-size: 14px;
-      line-height: 1.5;
-      color: var(--text);
-      transition: color 0.2s;
-    }
-
-    .check-item.done .check-label {
-      color: #aaa;
-      text-decoration: line-through;
-    }
-
+    .check-label { font-size: 14px; line-height: 1.5; color: var(--text); transition: color 0.2s; }
+    .check-item-wrap.done .check-label { color: #aaa; text-decoration: line-through; }
     .couple-badge {
-      display: inline-block;
-      font-size: 10px;
-      background: var(--gold-light);
-      color: var(--gold);
+      display: inline-block; font-size: 10px;
+      background: var(--gold-light); color: var(--gold);
+      border: 1px solid var(--pink-mid); border-radius: 10px;
+      padding: 1px 6px; margin-left: 6px;
+      font-family: sans-serif; vertical-align: middle; white-space: nowrap;
+    }
+    .memo-btn {
+      flex-shrink: 0;
+      width: 26px; height: 26px;
+      border: none; background: transparent;
+      cursor: pointer; border-radius: 6px;
+      color: #cbb8c0; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
+      margin-top: 1px;
+    }
+    .memo-btn:hover { background: var(--pink-mid); color: var(--gold); }
+    .memo-btn.has-note { color: var(--gold); }
+    .memo-btn.open { background: var(--gold-light); color: var(--gold); }
+    .memo-area {
+      display: none;
+      padding: 4px 8px 8px 38px;
+    }
+    .memo-area.visible { display: block; }
+    .memo-input {
+      width: 100%;
+      min-height: 56px;
+      padding: 8px 10px;
       border: 1px solid var(--pink-mid);
-      border-radius: 10px;
-      padding: 1px 6px;
-      margin-left: 6px;
-      font-family: sans-serif;
-      vertical-align: middle;
-      white-space: nowrap;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+      color: var(--text);
+      background: var(--gold-light);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+      line-height: 1.6;
     }
-
+    .memo-input:focus { border-color: var(--gold); }
+    .memo-input::placeholder { color: #c8b8bc; }
     .wedding-day {
-      text-align: center;
-      padding: 32px 20px;
+      text-align: center; padding: 32px 20px;
       background: linear-gradient(135deg, #fff8fb, #fff6ee);
-      border-radius: 16px;
-      border: 2px solid var(--pink-mid);
-      box-shadow: 0 4px 24px rgba(200,140,160,0.2);
-      margin-top: 8px;
+      border-radius: 16px; border: 2px solid var(--pink-mid);
+      box-shadow: 0 4px 24px rgba(200,140,160,0.2); margin-top: 8px;
     }
-
-    .wedding-day .day-icon {
-      font-size: 48px;
-      margin-bottom: 8px;
-    }
-
-    .wedding-day h2 {
-      font-size: 22px;
-      color: var(--gold);
-      letter-spacing: 0.15em;
-      margin-bottom: 4px;
-    }
-
-    .wedding-day p {
-      font-size: 14px;
-      color: var(--text-sub);
-      letter-spacing: 0.05em;
-    }
-
+    .wedding-day .day-icon { font-size: 48px; margin-bottom: 8px; }
+    .wedding-day h2 { font-size: 22px; color: var(--gold); letter-spacing: 0.15em; margin-bottom: 4px; }
+    .wedding-day p { font-size: 14px; color: var(--text-sub); letter-spacing: 0.05em; }
     footer {
-      text-align: center;
-      padding: 32px 16px 16px;
-      font-size: 12px;
-      color: var(--text-sub);
-      font-family: sans-serif;
+      text-align: center; padding: 32px 16px 16px;
+      font-size: 12px; color: var(--text-sub); font-family: sans-serif;
     }
-
     @media (max-width: 500px) {
       .timeline::before { left: 14px; }
       .period { padding-left: 40px; }
@@ -331,6 +232,7 @@
     <div class="progress-bar">
       <div class="progress-fill" id="progress-fill" style="width:0%"></div>
     </div>
+    <div class="sync-status" id="sync-status">接続中...</div>
   </div>
 </header>
 
@@ -343,56 +245,48 @@
 
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ お申し込み</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ お申し込み</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">お申込書のご記入</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">予約金のお預かり</span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">お申込書のご記入</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">予約金のお預かり</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
 
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ 契約打合せ</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ 契約打合せ</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">今後のスケジュールのご説明</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">マイページのご説明</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">LINEお友達登録</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">ドレスショップのご案内</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">前撮りのご案内</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">二次会のご案内</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">Learn&amp;Growのご説明</span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">今後のスケジュールのご説明</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">マイページのご説明</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">LINEお友達登録</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">ドレスショップのご案内</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">前撮りのご案内</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">二次会のご案内</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">Learn&amp;Growのご説明</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
 
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ Learn&amp;Grow</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ Learn&amp;Grow</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">個々の価値観の理解</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">理想の夫婦生活について</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">共有価値を見つける</span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】Learn&amp;Growのご予約<span class="couple-badge">お二人</span></span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">個々の価値観の理解</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">理想の夫婦生活について</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">共有価値を見つける</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】Learn&amp;Growのご予約<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
 
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ お申し込みから打合せ開始まで（衣装選び）</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ お申し込みから打合せ開始まで（衣装選び）</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】ドレスショップのご予約<span class="couple-badge">お二人</span></span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】ドレスの試着・決定<span class="couple-badge">お二人</span></span></label>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】ドレスショップのご予約<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】ドレスの試着・決定<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
     </div>
@@ -402,12 +296,10 @@
       <div class="period-header">2026年11月頃｜5ヶ月前</div>
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ 担当LF決定</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ 担当LF決定</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">お電話もしくはメールにてご連絡</span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">お電話もしくはメールにてご連絡</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
     </div>
@@ -417,19 +309,17 @@
       <div class="period-header">2026年12月頃｜4ヶ月前</div>
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ 招待状打合せ</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ 招待状打合せ</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">挙式披露宴のアウトフレームについて</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">招待状の作成準備</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">席次表の作成準備</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">衣装試着・親御様衣装について</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">引出物・引菓子・縁起物・プチギフトについて</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">今後の打合せ日程のご相談</span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】招待客リストの入力<span class="couple-badge">お二人</span></span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】ラブマッチアンケートの入力<span class="couple-badge">お二人</span></span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">挙式披露宴のアウトフレームについて</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">招待状の作成準備</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">席次表の作成準備</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">衣装試着・親御様衣装について</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">引出物・引菓子・縁起物・プチギフトについて</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">今後の打合せ日程のご相談</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】招待客リストの入力<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】ラブマッチアンケートの入力<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
     </div>
@@ -439,19 +329,17 @@
       <div class="period-header">2027年1月頃｜3ヶ月前</div>
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ 進行打合せ</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ 進行打合せ</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">挙式披露宴のアウトフレームのお打合せ</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">写真・映像商品のご紹介</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">席次表の確認</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">BGMのご準備について</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">進行の検討（主賓・乾杯・受付・祝儀・余興・スピーチ等）</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">サンプルムービーの確認</span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】席次表の入力<span class="couple-badge">お二人</span></span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】ヘアメイクリハーサル申込み<span class="couple-badge">お二人</span></span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">挙式披露宴のアウトフレームのお打合せ</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">写真・映像商品のご紹介</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">席次表の確認</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">BGMのご準備について</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">進行の検討（主賓・乾杯・受付・祝儀・余興・スピーチ等）</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">サンプルムービーの確認</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】席次表の入力<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】ヘアメイクリハーサル申込み<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
     </div>
@@ -462,46 +350,40 @@
 
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ 招待状発送</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ 招待状発送</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">招待状の作成</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">招待状の校正原稿提出</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">招待状の発送</span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">招待状の作成</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">招待状の校正原稿提出</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">招待状の発送</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
 
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ 料理打合せ</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ 料理打合せ</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">お料理のご紹介</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">挙式披露宴のアウトフレームのご相談</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">引出物・引菓子の確認</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">着付け・ヘア・メイク申込書の入力</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">記念写真焼増し申込書の入力</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">席次表の更新</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">記念品のご検討</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">当日ペーパーアイテムのご検討</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">お支払い方法のご検討</span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">お料理のご紹介</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">挙式披露宴のアウトフレームのご相談</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">引出物・引菓子の確認</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">着付け・ヘア・メイク申込書の入力</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">記念写真焼増し申込書の入力</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">席次表の更新</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">記念品のご検討</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">当日ペーパーアイテムのご検討</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">お支払い方法のご検討</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
 
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ 装花打合せ</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ 装花打合せ</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">会場装花のお打合せ</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">決定済み衣装写真のご用意</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">装花イメージのご検討</span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">会場装花のお打合せ</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">決定済み衣装写真のご用意</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">装花イメージのご検討</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
     </div>
@@ -511,15 +393,13 @@
       <div class="period-header">2027年2〜3月｜2〜1ヶ月前</div>
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ ヘアメイクリハーサル</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ ヘアメイクリハーサル</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">ヘアスタイルのご相談</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">メイクのご相談</span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】ヘアスタイルイメージのご検討<span class="couple-badge">お二人</span></span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】メイクイメージのご検討<span class="couple-badge">お二人</span></span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">ヘアスタイルのご相談</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">メイクのご相談</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】ヘアスタイルイメージのご検討<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】メイクイメージのご検討<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
     </div>
@@ -529,12 +409,10 @@
       <div class="period-header">2027年2月中旬〜3月初旬｜1.5〜1ヶ月前</div>
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ 招待状返信期日</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ 招待状返信期日</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">招待状返信の回収・確認</span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">招待状返信の回収・確認</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
     </div>
@@ -544,20 +422,18 @@
       <div class="period-header">2027年3月初旬｜1ヶ月前</div>
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ FIX打合せ</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ FIX打合せ</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">人数・手配物の最終確認</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">アレルギーヒアリング</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">二次会について</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">新居住所の確認</span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】席次表の更新<span class="couple-badge">お二人</span></span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】メニュー表校正データの作成<span class="couple-badge">お二人</span></span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】BGMリストの入力<span class="couple-badge">お二人</span></span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】司会進行メモの入力<span class="couple-badge">お二人</span></span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】持込DVDの作成<span class="couple-badge">お二人</span></span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">人数・手配物の最終確認</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">アレルギーヒアリング</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">二次会について</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">新居住所の確認</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】席次表の更新<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】メニュー表校正データの作成<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】BGMリストの入力<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】司会進行メモの入力<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】持込DVDの作成<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
     </div>
@@ -567,14 +443,12 @@
       <div class="period-header">2027年3月20日（金）｜2週間前の金曜日</div>
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ ご列席人数の最終締め切り</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ ご列席人数の最終締め切り</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">人数の最終確定</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">ご請求書の発行</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">席次表の更新</span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">人数の最終確定</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">ご請求書の発行</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">席次表の更新</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
     </div>
@@ -584,19 +458,17 @@
       <div class="period-header">2027年3月27日〜3月31日｜1週間〜3日前</div>
       <div class="section">
         <div class="section-title open" onclick="toggleSection(this)">
-          <h3>▼ 最終打合せ</h3>
-          <span class="section-progress"></span>
-          <span class="arrow">▲</span>
+          <h3>▼ 最終打合せ</h3><span class="section-progress"></span><span class="arrow">▲</span>
         </div>
         <div class="section-body">
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">搬入荷物の確認</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">当日スケジュールの最終確認</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">お車代・各種お礼について</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">その他最終確認</span></label>
-          <label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">写真データダウンロードについて</span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】持ち物チェックリストの更新<span class="couple-badge">お二人</span></span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】BGMリストの更新<span class="couple-badge">お二人</span></span></label>
-          <label class="check-item couple"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】挙式披露宴当日に使用する荷物の準備<span class="couple-badge">お二人</span></span></label>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">搬入荷物の確認</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">当日スケジュールの最終確認</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">お車代・各種お礼について</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">その他最終確認</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">写真データダウンロードについて</span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】持ち物チェックリストの更新<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】BGMリストの更新<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
+          <div class="check-item-wrap couple"><div class="check-item-row"><label class="check-item"><input type="checkbox"><div class="check-box"></div><span class="check-label">【お二人のご準備】挙式披露宴当日に使用する荷物の準備<span class="couple-badge">お二人</span></span></label><button class="memo-btn" type="button" title="備考">✏</button></div><div class="memo-area"><textarea class="memo-input" placeholder="備考・メモを入力..."></textarea></div></div>
         </div>
       </div>
     </div>
@@ -615,90 +487,159 @@
 </main>
 
 <footer>
-  <p>チェック状態はブラウザに自動保存されます</p>
+  <p>チェックと備考はリアルタイムで彼と共有されます</p>
 </footer>
 
 <script>
-  const STORAGE_KEY = 'weddingplan_checks';
+  const SUPABASE_URL = 'https://aljkafqamrbrkmowasjv.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsamthZnFhbXJicmttb3dhc2p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMzMyMjIsImV4cCI6MjA5MzcwOTIyMn0.Yi8rtMGNaP2pz0FvxIVSWbq6zkJxx5d9xX3UPoRlAyg';
 
-  function getChecks() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const statusEl = document.getElementById('sync-status');
+  let suppressRemote = false;
+
+  function getItemId(wrap) {
+    const label = wrap.querySelector('.check-label').textContent.trim();
+    const section = wrap.closest('.section');
+    const secTitle = section.querySelector('.section-title h3').textContent.trim();
+    return (secTitle + '::' + label).slice(0, 200);
   }
 
-  function saveChecks(obj) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
-  }
-
-  function getCheckId(checkbox) {
-    const label = checkbox.closest('label');
-    const text = label.querySelector('.check-label').textContent.trim();
-    const section = label.closest('.section');
-    const sectionTitle = section.querySelector('.section-title h3').textContent.trim();
-    return sectionTitle + '::' + text;
-  }
-
-  function updateItemStyle(checkbox) {
-    const item = checkbox.closest('.check-item');
-    if (checkbox.checked) {
-      item.classList.add('done');
-    } else {
-      item.classList.remove('done');
+  function applyRow(wrap, checked, note) {
+    const cb = wrap.querySelector('input[type="checkbox"]');
+    const textarea = wrap.querySelector('.memo-input');
+    const btn = wrap.querySelector('.memo-btn');
+    cb.checked = checked;
+    wrap.classList.toggle('done', checked);
+    if (textarea.value !== note) textarea.value = note;
+    btn.classList.toggle('has-note', note.length > 0);
+    if (note.length > 0) {
+      btn.classList.add('open');
+      wrap.querySelector('.memo-area').classList.add('visible');
     }
   }
 
   function updateSectionProgress(section) {
-    const checkboxes = section.querySelectorAll('input[type="checkbox"]');
+    const total = section.querySelectorAll('input[type="checkbox"]').length;
     const checked = section.querySelectorAll('input[type="checkbox"]:checked').length;
-    const total = checkboxes.length;
-    const span = section.querySelector('.section-progress');
-    if (span) span.textContent = `${checked} / ${total}`;
+    section.querySelector('.section-progress').textContent = checked + ' / ' + total;
   }
 
   function updateProgress() {
-    const all = document.querySelectorAll('input[type="checkbox"]');
+    const total = document.querySelectorAll('input[type="checkbox"]').length;
     const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
-    const total = all.length;
-    const pct = total ? Math.round((checked / total) * 100) : 0;
-    document.getElementById('progress-text').textContent = `完了 ${checked} / ${total} 項目`;
-    document.getElementById('progress-pct').textContent = `${pct}%`;
+    const pct = total ? Math.round(checked / total * 100) : 0;
+    document.getElementById('progress-text').textContent = '完了 ' + checked + ' / ' + total + ' 項目';
+    document.getElementById('progress-pct').textContent = pct + '%';
     document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  let saveTimer = {};
+  function scheduleUpsert(itemId, checked, note) {
+    clearTimeout(saveTimer[itemId]);
+    saveTimer[itemId] = setTimeout(async () => {
+      statusEl.textContent = '保存中…';
+      statusEl.className = 'sync-status syncing';
+      const { error } = await db.from('wedding_checks').upsert(
+        { item_id: itemId, checked, note, updated_at: new Date().toISOString() },
+        { onConflict: 'item_id' }
+      );
+      if (error) {
+        statusEl.textContent = '保存エラー';
+        statusEl.className = 'sync-status error';
+      } else {
+        statusEl.textContent = '同期済み ✓';
+        statusEl.className = 'sync-status';
+        setTimeout(() => { statusEl.textContent = ''; }, 2000);
+      }
+    }, 400);
   }
 
   function toggleSection(titleEl) {
     const body = titleEl.nextElementSibling;
     const isOpen = titleEl.classList.contains('open');
-    if (isOpen) {
-      body.style.display = 'none';
-      titleEl.classList.remove('open');
-    } else {
-      body.style.display = '';
-      titleEl.classList.add('open');
-    }
+    body.style.display = isOpen ? 'none' : '';
+    titleEl.classList.toggle('open', !isOpen);
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const checks = getChecks();
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  async function loadAll() {
+    const { data, error } = await db.from('wedding_checks').select('*');
+    if (error) {
+      statusEl.textContent = '読み込みエラー';
+      statusEl.className = 'sync-status error';
+      return;
+    }
+    const map = {};
+    (data || []).forEach(r => { map[r.item_id] = r; });
+    document.querySelectorAll('.check-item-wrap').forEach(wrap => {
+      const id = getItemId(wrap);
+      if (map[id]) applyRow(wrap, map[id].checked, map[id].note);
+    });
+    document.querySelectorAll('.section').forEach(updateSectionProgress);
+    updateProgress();
+    statusEl.textContent = '';
+  }
 
-    checkboxes.forEach(cb => {
-      const id = getCheckId(cb);
-      if (checks[id]) cb.checked = true;
-      updateItemStyle(cb);
-
-      cb.addEventListener('change', () => {
-        const data = getChecks();
-        const cid = getCheckId(cb);
-        if (cb.checked) data[cid] = true; else delete data[cid];
-        saveChecks(data);
-        updateItemStyle(cb);
-        updateSectionProgress(cb.closest('.section'));
-        updateProgress();
+  function setupRealtime() {
+    db.channel('wedding_checks_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'wedding_checks' }, payload => {
+        if (suppressRemote) return;
+        const r = payload.new;
+        if (!r) return;
+        document.querySelectorAll('.check-item-wrap').forEach(wrap => {
+          if (getItemId(wrap) === r.item_id) {
+            applyRow(wrap, r.checked, r.note);
+            updateSectionProgress(wrap.closest('.section'));
+            updateProgress();
+          }
+        });
+      })
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED') statusEl.textContent = '';
       });
+  }
+
+  document.querySelectorAll('.check-item-wrap').forEach(wrap => {
+    const cb = wrap.querySelector('input[type="checkbox"]');
+    const textarea = wrap.querySelector('.memo-input');
+    const btn = wrap.querySelector('.memo-btn');
+    const memoArea = wrap.querySelector('.memo-area');
+
+    cb.addEventListener('change', () => {
+      suppressRemote = true;
+      wrap.classList.toggle('done', cb.checked);
+      updateSectionProgress(wrap.closest('.section'));
+      updateProgress();
+      scheduleUpsert(getItemId(wrap), cb.checked, textarea.value);
+      setTimeout(() => { suppressRemote = false; }, 600);
     });
 
-    document.querySelectorAll('.section').forEach(sec => updateSectionProgress(sec));
-    updateProgress();
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const visible = memoArea.classList.toggle('visible');
+      btn.classList.toggle('open', visible);
+      if (visible) textarea.focus();
+    });
+
+    let noteTimer;
+    textarea.addEventListener('input', () => {
+      btn.classList.toggle('has-note', textarea.value.length > 0);
+      clearTimeout(noteTimer);
+      noteTimer = setTimeout(() => {
+        suppressRemote = true;
+        scheduleUpsert(getItemId(wrap), cb.checked, textarea.value);
+        setTimeout(() => { suppressRemote = false; }, 600);
+      }, 600);
+    });
   });
+
+  document.querySelectorAll('.section').forEach(updateSectionProgress);
+  updateProgress();
+  statusEl.textContent = '接続中...';
+  statusEl.className = 'sync-status syncing';
+  loadAll().then(setupRealtime);
 </script>
 </body>
 </html>
