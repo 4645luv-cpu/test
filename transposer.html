@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>楽譜移調アプリ - Piano to Alto Sax</title>
+  <link rel="stylesheet" href="/sheet-transposer/static/css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.3/dist/abcjs-basic-min.js"></script>
+</head>
+<body>
+  <div class="app-wrapper">
+
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo">
+          <span class="logo-icon">🎷</span>
+          <div>
+            <h1>楽譜移調アプリ</h1>
+            <p class="subtitle">Piano Sheet Music → Alto Saxophone</p>
+          </div>
+        </div>
+        <div class="badge">E♭管 / 長6度移調</div>
+      </div>
+    </header>
+
+    <main class="main">
+
+      <!-- Step 1: Upload -->
+      <section class="card" id="uploadCard">
+        <div class="step-label">STEP 1</div>
+        <h2 class="card-title">楽譜の写真をアップロード</h2>
+
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-content" id="dropContent">
+            <div class="drop-icon">📸</div>
+            <p class="drop-main">ここに楽譜の写真をドロップ</p>
+            <p class="drop-or">または</p>
+            <label for="fileInput" class="file-btn">ファイルを選択</label>
+            <input type="file" id="fileInput" accept="image/*" hidden />
+            <p class="drop-hint">JPEG・PNG・WebP 対応</p>
+          </div>
+        </div>
+
+        <div class="preview-wrap" id="previewWrap" hidden>
+          <div class="preview-label">アップロードした楽譜</div>
+          <div class="preview-img-box">
+            <img id="previewImg" alt="楽譜プレビュー" />
+          </div>
+          <div class="preview-actions">
+            <button class="btn btn-primary" id="transposeBtn">
+              <span class="btn-icon">🎷</span>アルトサックス用に移調する
+            </button>
+            <button class="btn btn-ghost" id="clearBtn">別の画像を選択</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2: Result -->
+      <section class="card" id="resultCard" hidden>
+        <div class="step-label">STEP 2</div>
+        <h2 class="card-title">アルトサックス用移調楽譜</h2>
+
+        <div class="loading-box" id="loadingBox">
+          <div class="spinner"></div>
+          <p class="loading-text">楽譜を解析・移調中...</p>
+          <p class="loading-sub">Claude AIが読み取りと移調を行っています</p>
+        </div>
+
+        <div id="resultContent" hidden>
+          <div class="info-banner">
+            <span class="info-icon">ℹ️</span>
+            コンサートピッチから長6度（+9半音）上に移調済み
+          </div>
+
+          <div class="sheet-box">
+            <div id="sheetMusic"></div>
+          </div>
+
+          <details class="abc-details">
+            <summary>ABC記譜法テキストを表示</summary>
+            <div class="abc-inner">
+              <pre id="abcText" class="abc-pre"></pre>
+              <button class="btn btn-sm" id="copyBtn">📋 コピー</button>
+            </div>
+          </details>
+
+          <div class="result-actions">
+            <button class="btn btn-outline" id="downloadSvgBtn">📥 SVGダウンロード</button>
+            <button class="btn btn-ghost" id="retryBtn">別の楽譜を試す</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="footer">
+      <p>アルトサックス（E♭管）はコンサートピッチから長6度（9半音）高く記譜します</p>
+      <p class="footer-sub">Powered by Claude AI Vision</p>
+    </footer>
+
+  </div>
+
+  <script src="/sheet-transposer/static/js/app.js"></script>
+</body>
+</html>
