@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drive「のコピー」削除</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Drive「のコピー」削除</h1>
+    <p class="description">
+      Google Drive内のファイル名に含まれる<br>
+      <strong>「のコピー」</strong>を一括削除します
+    </p>
+
+    <div id="preview-section" class="hidden">
+      <div class="preview-header">
+        <span id="preview-count">0</span> 件のファイルが対象です
+      </div>
+      <div id="preview-list" class="preview-list"></div>
+    </div>
+
+    <div id="status" class="status hidden"></div>
+
+    <div id="progress-section" class="hidden">
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+      <p id="progress-text" class="progress-text">0 / 0</p>
+    </div>
+
+    <div class="button-group">
+      <button id="preview-btn" class="btn btn-secondary">
+        プレビュー確認
+      </button>
+      <button id="run-btn" class="btn btn-primary hidden">
+        一括リネーム実行
+      </button>
+      <button id="cancel-btn" class="btn btn-ghost hidden">
+        キャンセル
+      </button>
+    </div>
+
+    <div id="result-section" class="hidden">
+      <p id="result-text" class="result-text"></p>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
