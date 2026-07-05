@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>シンプルアラーム</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="logo">⏰</div>
+      <h1>シンプルアラーム</h1>
+      <div id="current-time" class="current-time">--:--:--</div>
+      <div id="current-date" class="current-date"></div>
+    </header>
+
+    <section class="card set-alarm">
+      <h2><span class="section-icon">＋</span> アラームを追加</h2>
+      <div class="input-group">
+        <div class="input-wrap">
+          <label>時刻</label>
+          <input type="time" id="alarm-time" />
+        </div>
+        <div class="input-wrap flex1">
+          <label>ラベル（任意）</label>
+          <input type="text" id="alarm-label" placeholder="例：朝の薬、会議..." maxlength="30" />
+        </div>
+        <button id="add-btn"><span>追加</span></button>
+      </div>
+    </section>
+
+    <section class="card alarm-list">
+      <h2><span class="section-icon">🔔</span> アラーム一覧</h2>
+      <ul id="alarms"></ul>
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">🌙</div>
+        <p>アラームが登録されていません</p>
+        <p class="empty-sub">上のフォームから追加しましょう</p>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

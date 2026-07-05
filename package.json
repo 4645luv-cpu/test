@@ -1,0 +1,9 @@
+{
+  "name": "sax-transpose-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "楽譜写真をアルトサックス用に移調するWebアプリ",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0"
+  }
+}
