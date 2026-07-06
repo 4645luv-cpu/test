@@ -25,13 +25,100 @@
   const doremiContainer = $('doremi-container');
   const warningsBox = $('warnings');
 
+  const keyPanel = $('key-panel');
+  const keyInput = $('key-input');
+  const keySave = $('key-save');
+  const keyStatus = $('key-status');
+  const keyToggle = $('key-toggle');
+
   const state = {
     imageBase64: null,
     mediaType: null,
     data: null,
     view: 'transposed',
     busy: false,
+    serverHasKey: false,
   };
+
+  const KEY_STORAGE = 'sax_transpose_api_key';
+
+  /* ---------- APIキー設定 ---------- */
+
+  function savedKey() {
+    try { return localStorage.getItem(KEY_STORAGE) || null; } catch (_) { return null; }
+  }
+
+  async function initKeyPanel() {
+    try {
+      const res = await fetch('/api/analyze');
+      const j = await res.json();
+      state.serverHasKey = !!(j && j.keyConfigured && j.keyValid !== false);
+    } catch (_) { /* 判定できない場合は保存済みキーに頼る */ }
+    if (state.serverHasKey) {
+      keyPanel.hidden = true;
+      keyToggle.hidden = true;
+    } else if (savedKey()) {
+      keyPanel.hidden = true;
+      keyToggle.hidden = false;
+    } else {
+      keyPanel.hidden = false;
+      keyToggle.hidden = true;
+    }
+  }
+
+  keyToggle.addEventListener('click', () => {
+    keyPanel.hidden = false;
+    keyToggle.hidden = true;
+    keyInput.focus();
+  });
+
+  keySave.addEventListener('click', async () => {
+    const key = keyInput.value.trim();
+    if (!/^sk-ant-[\w-]{20,}$/.test(key)) {
+      setKeyStatus('「sk-ant-」で始まるAPIキーを貼り付けてください。', 'error');
+      return;
+    }
+    keySave.disabled = true;
+    setKeyStatus('キーを確認しています…', 'info');
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: key, validate: true }),
+      });
+      const j = await res.json().catch(() => null);
+      if (j && j.keyValid === false) {
+        setKeyStatus('このAPIキーは無効です。コピーミスがないか確認してください。', 'error');
+        return;
+      }
+      try { localStorage.setItem(KEY_STORAGE, key); } catch (_) {}
+      keyInput.value = '';
+      setKeyStatus('', 'info');
+      keyPanel.hidden = true;
+      keyToggle.hidden = false;
+      hideError();
+      showToastOnDrop('✅ APIキーを保存しました。楽譜の写真を送ってください!');
+      if (state.imageBase64) analyze();
+    } catch (_) {
+      // 検証に失敗しても保存はしておく(オフライン等)
+      try { localStorage.setItem(KEY_STORAGE, key); } catch (__) {}
+      keyPanel.hidden = true;
+      keyToggle.hidden = false;
+    } finally {
+      keySave.disabled = false;
+    }
+  });
+
+  function setKeyStatus(msg, kind) {
+    keyStatus.textContent = msg;
+    keyStatus.hidden = !msg;
+    keyStatus.className = 'key-status' + (kind === 'error' ? ' error' : '');
+  }
+
+  function showToastOnDrop(msg) {
+    const el = document.querySelector('.drop-text');
+    if (el) el.innerHTML = `<strong>${msg}</strong>`;
+  }
 
   /* ---------- 画像の選択と縮小 ---------- */
 
@@ -108,15 +195,22 @@
     statusText.textContent = 'AIが楽譜を読み取っています…(30秒〜2分ほどかかります)';
 
     try {
+      const body = { image: state.imageBase64, mediaType: state.mediaType };
+      const key = savedKey();
+      if (key && !state.serverHasKey) body.apiKey = key;
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: state.imageBase64, mediaType: state.mediaType }),
+        body: JSON.stringify(body),
       });
       let payload = null;
       try { payload = await res.json(); } catch (_) { /* 非JSONレスポンス */ }
 
       if (!res.ok) {
+        if (payload && (payload.error === 'no_api_key' || payload.error === 'bad_api_key')) {
+          keyPanel.hidden = false;
+          keyToggle.hidden = true;
+        }
         const msg = (payload && payload.message) ||
           (res.status === 413 ? '画像が大きすぎます。撮り直すか小さい画像でお試しください。'
             : res.status === 504 ? '解析がタイムアウトしました。楽譜の一部だけを撮影してお試しください。'
@@ -394,4 +488,6 @@
     state.data = data;
     showResult();
   };
+
+  initKeyPanel();
 })();

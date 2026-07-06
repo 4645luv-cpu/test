@@ -18,6 +18,17 @@
 
     <!-- アップロード -->
     <section class="card" id="upload-card">
+      <div id="key-panel" class="key-panel" hidden>
+        <p class="key-title">🔑 APIキー設定(最初に1回だけ)</p>
+        <p class="key-desc">Claude APIキー(sk-ant-…で始まる文字列)を貼り付けて保存してください。キーはこの端末のブラウザ内にのみ保存され、外部には送信されません(解析時にあなたのVercelサーバー経由でClaude APIにだけ使われます)。</p>
+        <div class="key-row">
+          <input type="password" id="key-input" placeholder="sk-ant-..." autocomplete="off">
+          <button id="key-save" class="btn primary">保存</button>
+        </div>
+        <p id="key-status" class="key-status" hidden></p>
+      </div>
+      <button id="key-toggle" class="key-toggle" hidden>🔑 APIキーを変更する</button>
+
       <div id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="楽譜の写真を選択">
         <div class="drop-zone-inner">
           <div class="drop-icon">📷</div>

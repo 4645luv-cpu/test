@@ -100,21 +100,41 @@ module.exports = async (req, res) => {
     return;
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    res.status(500).json({
-      error: 'no_api_key',
-      message: 'サーバーにANTHROPIC_API_KEYが設定されていません。Vercelのプロジェクト設定 → Environment Variables で設定してください。',
-    });
+  const { image, mediaType, apiKey, validate } = req.body || {};
+
+  // ブラウザから渡されたキー(なければサーバーの環境変数)を使う
+  const userKey = (typeof apiKey === 'string' && /^sk-ant-[\w-]{20,}$/.test(apiKey.trim())) ? apiKey.trim() : null;
+  const key = userKey || process.env.ANTHROPIC_API_KEY || null;
+
+  if (!key) {
+    const message = (apiKey && !userKey)
+      ? 'APIキーの形式が正しくありません。「sk-ant-」で始まるキーを貼り付けてください。'
+      : 'APIキーが設定されていません。アプリ画面の「APIキー設定」に貼り付けてください。';
+    res.status(401).json({ error: 'no_api_key', message });
     return;
   }
 
-  const { image, mediaType } = req.body || {};
+  const client = new Anthropic({ apiKey: key });
+
+  // キーの有効性チェックだけを行うモード(画面の「保存」ボタンから呼ばれる)
+  if (validate === true) {
+    try {
+      await client.models.retrieve('claude-opus-4-8');
+      res.status(200).json({ ok: true, keyValid: true });
+    } catch (e) {
+      if (e instanceof Anthropic.AuthenticationError) {
+        res.status(200).json({ ok: true, keyValid: false });
+      } else {
+        res.status(200).json({ ok: true, keyValid: null });
+      }
+    }
+    return;
+  }
+
   if (!image || typeof image !== 'string' || !ALLOWED_MEDIA_TYPES.includes(mediaType)) {
     res.status(400).json({ error: 'bad_request', message: '画像データが不正です。' });
     return;
   }
-
-  const client = new Anthropic();
 
   try {
     const response = await client.messages.create({
@@ -155,7 +175,7 @@ module.exports = async (req, res) => {
     res.status(200).json(data);
   } catch (err) {
     if (err instanceof Anthropic.AuthenticationError) {
-      res.status(500).json({ error: 'bad_api_key', message: 'APIキーが無効です。Vercelの環境変数 ANTHROPIC_API_KEY を確認してください。' });
+      res.status(401).json({ error: 'bad_api_key', message: 'APIキーが無効です。「APIキー設定」で正しいキーを設定し直してください。' });
     } else if (err instanceof Anthropic.RateLimitError) {
       res.status(429).json({ error: 'rate_limited', message: 'アクセスが集中しています。少し待ってからもう一度お試しください。' });
     } else if (err instanceof Anthropic.APIConnectionError) {
