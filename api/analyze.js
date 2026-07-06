@@ -79,6 +79,22 @@ const PROMPT = `この画像は楽譜の写真です。光学楽譜認識(OMR)�
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
 
+  // ヘルスチェック: APIキーが設定済みか・有効かを返す(キーの値は返さない)
+  if (req.method === 'GET') {
+    const configured = !!process.env.ANTHROPIC_API_KEY;
+    let keyValid = null;
+    if (configured) {
+      try {
+        await new Anthropic().models.retrieve('claude-opus-4-8');
+        keyValid = true;
+      } catch (e) {
+        keyValid = e instanceof Anthropic.AuthenticationError ? false : null;
+      }
+    }
+    res.status(200).json({ ok: true, keyConfigured: configured, keyValid });
+    return;
+  }
+
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'method_not_allowed', message: 'POSTで送信してください。' });
     return;
