@@ -26,6 +26,14 @@
   const overlayWrap = $('overlay-wrap');
   const overlayCanvas = $('overlay-canvas');
   const downloadBtn = $('download-btn');
+  const sizeRange = $('size-range');
+  const sizeValue = $('size-value');
+  const accSelect = $('acc-select');
+  const editPanel = $('edit-panel');
+  const editInput = $('edit-input');
+  const editApply = $('edit-apply');
+  const editDelete = $('edit-delete');
+  const editCancel = $('edit-cancel');
   const warningsBox = $('warnings');
   const viewTabs = document.querySelector('.view-tabs');
   const doremiCheckLabel = doremiCheck ? doremiCheck.closest('label') : null;
@@ -45,6 +53,10 @@
     mode: 'overlay',
     busy: false,
     serverHasKey: false,
+    overlayImg: null,      // 描画用にキャッシュした元画像
+    overlayImgUrl: null,
+    labelBoxes: [],        // タップ判定用の文字位置 [{i,x,y,w,h}]
+    editIndex: -1,         // 編集中のドレミのindex
   };
 
   const KEY_STORAGE = 'sax_transpose_api_key';
@@ -237,6 +249,8 @@
       }
       payload._mode = state.mode;
       state.data = payload;
+      state.editIndex = -1;
+      editPanel.hidden = true;
       sourceSelect.value = 'auto';
       showResult();
     } catch (err) {
@@ -303,6 +317,7 @@
     const isOverlay = d._mode === 'overlay';
     if (viewTabs) viewTabs.hidden = isOverlay;
     if (doremiCheckLabel) doremiCheckLabel.hidden = isOverlay;
+    document.querySelectorAll('.overlay-only').forEach((el) => { el.hidden = !isOverlay; });
     overlayWrap.hidden = !isOverlay;
     if (isOverlay) {
       scoreContainer.hidden = true;
@@ -499,6 +514,26 @@
 
   /* ---------- 元画像への書き込み描画 ---------- */
 
+  function ensureOverlayImage(cb) {
+    if (state.overlayImg && state.overlayImgUrl === state.previewDataUrl) {
+      cb(state.overlayImg);
+      return;
+    }
+    const img = new Image();
+    img.onload = () => {
+      state.overlayImg = img;
+      state.overlayImgUrl = state.previewDataUrl;
+      cb(img);
+    };
+    img.src = state.previewDataUrl;
+  }
+
+  function overlayUseSharps(fifths) {
+    if (accSelect.value === 'sharp') return true;
+    if (accSelect.value === 'flat') return false;
+    return fifths >= 0;
+  }
+
   function drawOverlay() {
     const d = state.data;
     if (!d || !state.previewDataUrl) return;
@@ -506,49 +541,133 @@
     const target = targetSelect.value;
     const shift = MU.semitoneShift(source, target);
     const fifths = MU.transposeFifths(d.keyFifths, shift);
-    const useSharps = fifths >= 0;
+    const useSharps = overlayUseSharps(fifths);
     scoreInfo.textContent = `${MU.TARGETS[target].label} 用のドレミを書き込みました / 調号: ${jpKey(d.keyFifths)} → ${jpKey(fifths)}`;
 
-    const img = new Image();
-    img.onload = () => {
+    ensureOverlayImage((img) => {
       overlayCanvas.width = img.naturalWidth;
       overlayCanvas.height = img.naturalHeight;
       const ctx = overlayCanvas.getContext('2d');
       ctx.drawImage(img, 0, 0);
 
       const gap = Math.max(5, Math.min(60, d.staffLineGap || Math.round(img.naturalWidth / 120)));
-      const fs = Math.max(13, Math.min(46, Math.round(gap * 2.0)));
+      const scale = (parseInt(sizeRange.value, 10) || 100) / 100;
+      const fs = Math.max(8, Math.min(64, Math.round(gap * 1.3 * scale)));
       ctx.font = `bold ${fs}px "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
+      state.labelBoxes = [];
       let lastRight = -1e9;
       let lastY = -1e9;
       let staggered = false;
-      for (const n of d.notes || []) {
-        const text = MU.doremiForShift(n.pitch, shift, useSharps);
-        if (!text || !isFinite(n.x) || !isFinite(n.y)) continue;
+      (d.notes || []).forEach((n, i) => {
+        if (n._hidden || !isFinite(n.x) || !isFinite(n.y)) return;
+        const text = n._manual || MU.doremiForShift(n.pitch, shift, useSharps);
+        if (!text) return;
         const w = ctx.measureText(text).width;
-        let y = n.y + gap * 3.4;
+        let y = n.y + gap * 2.6 + fs * 0.5;
         // 同じ段で前の文字と重なるときは段違いにして読めるようにする
         const sameLine = Math.abs(n.y - lastY) < gap * 6;
-        if (sameLine && n.x - w / 2 < lastRight + 2) {
+        if (sameLine && n.x - w / 2 < lastRight + 1) {
           staggered = !staggered;
-          if (staggered) y += fs * 0.95;
+          if (staggered) y += fs;
         } else {
           staggered = false;
         }
-        ctx.lineWidth = Math.max(3, fs / 4.5);
+        const selected = i === state.editIndex;
+        ctx.lineWidth = Math.max(2.5, fs / 4.5);
         ctx.strokeStyle = 'rgba(255,255,255,0.92)';
         ctx.strokeText(text, n.x, y);
-        ctx.fillStyle = '#1533b8';
+        ctx.fillStyle = selected ? '#e07800' : '#1533b8';
         ctx.fillText(text, n.x, y);
+        if (selected) {
+          ctx.strokeStyle = '#e07800';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(n.x - w / 2 - 4, y - fs * 0.7, w + 8, fs * 1.4);
+        }
+        state.labelBoxes.push({ i, x: n.x - w / 2, y: y - fs * 0.7, w, h: fs * 1.4 });
         lastRight = n.x + w / 2;
         lastY = n.y;
-      }
-    };
-    img.src = state.previewDataUrl;
+      });
+    });
   }
+
+  /* タップでドレミを修正 */
+  overlayCanvas.addEventListener('click', (e) => {
+    if (!state.data || state.data._mode !== 'overlay') return;
+    const rect = overlayCanvas.getBoundingClientRect();
+    const sx = overlayCanvas.width / rect.width;
+    const sy = overlayCanvas.height / rect.height;
+    const cx = (e.clientX - rect.left) * sx;
+    const cy = (e.clientY - rect.top) * sy;
+    const pad = 8;
+    let hit = null;
+    let best = Infinity;
+    for (const b of state.labelBoxes) {
+      if (cx >= b.x - pad && cx <= b.x + b.w + pad && cy >= b.y - pad && cy <= b.y + b.h + pad) {
+        const dist = Math.abs(cx - (b.x + b.w / 2)) + Math.abs(cy - (b.y + b.h / 2));
+        if (dist < best) { best = dist; hit = b; }
+      }
+    }
+    if (!hit) return;
+    state.editIndex = hit.i;
+    const n = state.data.notes[hit.i];
+    const source = effectiveSource();
+    const target = targetSelect.value;
+    const shift = MU.semitoneShift(source, target);
+    const fifths = MU.transposeFifths(state.data.keyFifths, shift);
+    editInput.value = n._manual || MU.doremiForShift(n.pitch, shift, overlayUseSharps(fifths));
+    editPanel.hidden = false;
+    drawOverlay();
+  });
+
+  editPanel.addEventListener('click', (e) => {
+    const btn = e.target.closest('.chip-btn');
+    if (!btn) return;
+    if (btn.dataset.name) {
+      editInput.value = btn.dataset.name;
+    } else if (btn.dataset.acc) {
+      const base = editInput.value.replace(/[♯♭]/g, '');
+      const cur = (editInput.value.match(/[♯♭]/) || [''])[0];
+      editInput.value = base + (cur === btn.dataset.acc ? '' : btn.dataset.acc);
+    }
+  });
+
+  editApply.addEventListener('click', () => {
+    if (state.editIndex < 0) return;
+    const n = state.data.notes[state.editIndex];
+    const v = editInput.value.trim();
+    n._manual = v || null; // 空なら自動計算に戻す
+    n._hidden = false;
+    closeEditPanel();
+  });
+  editDelete.addEventListener('click', () => {
+    if (state.editIndex < 0) return;
+    state.data.notes[state.editIndex]._hidden = true;
+    closeEditPanel();
+  });
+  editCancel.addEventListener('click', closeEditPanel);
+
+  function closeEditPanel() {
+    editPanel.hidden = true;
+    state.editIndex = -1;
+    drawOverlay();
+  }
+
+  let sizeRaf = false;
+  sizeRange.addEventListener('input', () => {
+    sizeValue.textContent = `${sizeRange.value}%`;
+    if (sizeRaf) return;
+    sizeRaf = true;
+    requestAnimationFrame(() => {
+      sizeRaf = false;
+      if (state.data && state.data._mode === 'overlay') drawOverlay();
+    });
+  });
+  accSelect.addEventListener('change', () => {
+    if (state.data && state.data._mode === 'overlay') drawOverlay();
+  });
 
   downloadBtn.addEventListener('click', () => {
     try {

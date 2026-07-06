@@ -124,6 +124,42 @@ body {
 
 /* 書き込み結果 */
 .overlay-wrap { text-align: center; }
+.overlay-hint { color: var(--muted); font-size: 0.8rem; margin-bottom: 8px; text-align: left; }
+.control input[type="range"] { width: 150px; accent-color: var(--accent); }
+
+.edit-panel {
+  margin-top: 12px;
+  background: rgba(245, 185, 66, 0.08);
+  border: 1px solid rgba(245, 185, 66, 0.4);
+  border-radius: 12px;
+  padding: 12px 14px;
+  text-align: left;
+}
+.edit-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; }
+.edit-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.chip-btn {
+  background: #1a2135;
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+.chip-btn:hover { border-color: var(--accent); }
+.edit-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.edit-row input {
+  width: 110px;
+  background: #1a2135;
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+.edit-row .btn { padding: 8px 16px; font-size: 0.85rem; }
 .overlay-wrap canvas {
   width: 100%;
   height: auto;

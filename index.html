@@ -96,6 +96,18 @@
           <input type="checkbox" id="doremi-check" checked>
           <span>ドレミを表示</span>
         </label>
+        <label class="control overlay-only">
+          <span>文字サイズ <span id="size-value">100%</span></span>
+          <input type="range" id="size-range" min="40" max="220" step="10" value="100">
+        </label>
+        <label class="control overlay-only">
+          <span>♯/♭の表記</span>
+          <select id="acc-select">
+            <option value="auto">自動</option>
+            <option value="sharp">♯で表記</option>
+            <option value="flat">♭で表記</option>
+          </select>
+        </label>
       </div>
 
       <div class="view-tabs">
@@ -108,7 +120,28 @@
       <div id="score-container" class="score-container"></div>
       <div id="doremi-container" class="doremi-container" hidden></div>
       <div id="overlay-wrap" class="overlay-wrap" hidden>
+        <p class="overlay-hint">💡 書き込まれたドレミをタップすると、修正・削除できます</p>
         <canvas id="overlay-canvas"></canvas>
+        <div id="edit-panel" class="edit-panel" hidden>
+          <p class="edit-title">タップしたドレミを修正</p>
+          <div class="edit-chips">
+            <button type="button" class="chip-btn" data-name="ド">ド</button>
+            <button type="button" class="chip-btn" data-name="レ">レ</button>
+            <button type="button" class="chip-btn" data-name="ミ">ミ</button>
+            <button type="button" class="chip-btn" data-name="ファ">ファ</button>
+            <button type="button" class="chip-btn" data-name="ソ">ソ</button>
+            <button type="button" class="chip-btn" data-name="ラ">ラ</button>
+            <button type="button" class="chip-btn" data-name="シ">シ</button>
+            <button type="button" class="chip-btn" data-acc="♯">♯</button>
+            <button type="button" class="chip-btn" data-acc="♭">♭</button>
+          </div>
+          <div class="edit-row">
+            <input id="edit-input" type="text" maxlength="8" placeholder="例: ド♯">
+            <button id="edit-apply" class="btn primary">適用</button>
+            <button id="edit-delete" class="btn ghost">この文字を削除</button>
+            <button id="edit-cancel" class="btn ghost">閉じる</button>
+          </div>
+        </div>
         <div class="preview-actions">
           <button id="download-btn" class="btn primary">📥 この画像を保存</button>
         </div>
