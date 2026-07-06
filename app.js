@@ -23,7 +23,12 @@
   const scoreInfo = $('score-info');
   const scoreContainer = $('score-container');
   const doremiContainer = $('doremi-container');
+  const overlayWrap = $('overlay-wrap');
+  const overlayCanvas = $('overlay-canvas');
+  const downloadBtn = $('download-btn');
   const warningsBox = $('warnings');
+  const viewTabs = document.querySelector('.view-tabs');
+  const doremiCheckLabel = doremiCheck ? doremiCheck.closest('label') : null;
 
   const keyPanel = $('key-panel');
   const keyInput = $('key-input');
@@ -34,8 +39,10 @@
   const state = {
     imageBase64: null,
     mediaType: null,
+    previewDataUrl: null,
     data: null,
     view: 'transposed',
+    mode: 'overlay',
     busy: false,
     serverHasKey: false,
   };
@@ -146,6 +153,7 @@
       const { base64, dataUrl } = await shrinkImage(file);
       state.imageBase64 = base64;
       state.mediaType = 'image/jpeg';
+      state.previewDataUrl = dataUrl;
       previewImg.src = dataUrl;
       previewWrap.hidden = false;
       dropZone.classList.add('compact');
@@ -192,10 +200,10 @@
     hideError();
     resultCard.hidden = true;
     statusBox.hidden = false;
-    statusText.textContent = 'AIが楽譜を読み取っています…(30秒〜2分ほどかかります)';
+    statusText.textContent = 'AIが楽譜を読み取っています…(1〜3分ほどかかることがあります)';
 
     try {
-      const body = { image: state.imageBase64, mediaType: state.mediaType };
+      const body = { image: state.imageBase64, mediaType: state.mediaType, mode: state.mode };
       const key = savedKey();
       if (key && !state.serverHasKey) body.apiKey = key;
       const res = await fetch('/api/analyze', {
@@ -222,10 +230,12 @@
         showError('楽譜を見つけられませんでした。五線譜がはっきり写るように撮影してください。');
         return;
       }
-      if (!Array.isArray(payload.measures) || payload.measures.length === 0) {
+      const items = state.mode === 'overlay' ? payload.notes : payload.measures;
+      if (!Array.isArray(items) || items.length === 0) {
         showError('音符を読み取れませんでした。明るい場所で楽譜全体がはっきり写るように撮影してください。');
         return;
       }
+      payload._mode = state.mode;
       state.data = payload;
       sourceSelect.value = 'auto';
       showResult();
@@ -242,6 +252,14 @@
   sourceSelect.addEventListener('change', renderAll);
   targetSelect.addEventListener('change', renderAll);
   doremiCheck.addEventListener('change', renderAll);
+  document.querySelectorAll('input[name="mode"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      if (!radio.checked) return;
+      state.mode = radio.value;
+      // 既に写真があるなら新しいモードで解析し直す
+      if (state.imageBase64 && !state.busy) analyze();
+    });
+  });
   document.querySelectorAll('.view-tabs .tab').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.view-tabs .tab').forEach((b) => b.classList.remove('active'));
@@ -281,6 +299,17 @@
     if (!d) return;
     warningsBox.hidden = !d.warnings;
     if (d.warnings) warningsBox.textContent = '⚠️ 読み取りメモ: ' + d.warnings;
+
+    const isOverlay = d._mode === 'overlay';
+    if (viewTabs) viewTabs.hidden = isOverlay;
+    if (doremiCheckLabel) doremiCheckLabel.hidden = isOverlay;
+    overlayWrap.hidden = !isOverlay;
+    if (isOverlay) {
+      scoreContainer.hidden = true;
+      doremiContainer.hidden = true;
+      drawOverlay();
+      return;
+    }
 
     const showDoremi = doremiCheck.checked;
     const source = effectiveSource();
@@ -468,6 +497,68 @@
     doremiContainer.innerHTML = parts.join('<span class="barline">|</span>');
   }
 
+  /* ---------- 元画像への書き込み描画 ---------- */
+
+  function drawOverlay() {
+    const d = state.data;
+    if (!d || !state.previewDataUrl) return;
+    const source = effectiveSource();
+    const target = targetSelect.value;
+    const shift = MU.semitoneShift(source, target);
+    const fifths = MU.transposeFifths(d.keyFifths, shift);
+    const useSharps = fifths >= 0;
+    scoreInfo.textContent = `${MU.TARGETS[target].label} 用のドレミを書き込みました / 調号: ${jpKey(d.keyFifths)} → ${jpKey(fifths)}`;
+
+    const img = new Image();
+    img.onload = () => {
+      overlayCanvas.width = img.naturalWidth;
+      overlayCanvas.height = img.naturalHeight;
+      const ctx = overlayCanvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+
+      const gap = Math.max(5, Math.min(60, d.staffLineGap || Math.round(img.naturalWidth / 120)));
+      const fs = Math.max(13, Math.min(46, Math.round(gap * 2.0)));
+      ctx.font = `bold ${fs}px "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      let lastRight = -1e9;
+      let lastY = -1e9;
+      let staggered = false;
+      for (const n of d.notes || []) {
+        const text = MU.doremiForShift(n.pitch, shift, useSharps);
+        if (!text || !isFinite(n.x) || !isFinite(n.y)) continue;
+        const w = ctx.measureText(text).width;
+        let y = n.y + gap * 3.4;
+        // 同じ段で前の文字と重なるときは段違いにして読めるようにする
+        const sameLine = Math.abs(n.y - lastY) < gap * 6;
+        if (sameLine && n.x - w / 2 < lastRight + 2) {
+          staggered = !staggered;
+          if (staggered) y += fs * 0.95;
+        } else {
+          staggered = false;
+        }
+        ctx.lineWidth = Math.max(3, fs / 4.5);
+        ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+        ctx.strokeText(text, n.x, y);
+        ctx.fillStyle = '#1533b8';
+        ctx.fillText(text, n.x, y);
+        lastRight = n.x + w / 2;
+        lastY = n.y;
+      }
+    };
+    img.src = state.previewDataUrl;
+  }
+
+  downloadBtn.addEventListener('click', () => {
+    try {
+      const a = document.createElement('a');
+      a.download = 'doremi-score.jpg';
+      a.href = overlayCanvas.toDataURL('image/jpeg', 0.92);
+      a.click();
+    } catch (_) { /* noop */ }
+  });
+
   /* ---------- 共通 ---------- */
 
   function showError(msg) {
@@ -484,7 +575,8 @@
   }
 
   // テスト用フック: 解析結果を直接流し込んで描画を確認できる
-  window.__setAnalysis = function (data) {
+  window.__setAnalysis = function (data, previewDataUrl) {
+    if (previewDataUrl) state.previewDataUrl = previewDataUrl;
     state.data = data;
     showResult();
   };

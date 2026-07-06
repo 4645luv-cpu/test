@@ -29,6 +29,18 @@
       </div>
       <button id="key-toggle" class="key-toggle" hidden>🔑 APIキーを変更する</button>
 
+      <div class="mode-select">
+        <span class="mode-label">出力方法</span>
+        <label class="mode-option">
+          <input type="radio" name="mode" value="overlay" checked>
+          <span><strong>元の楽譜にドレミを書き込む</strong>(おすすめ・高精度)</span>
+        </label>
+        <label class="mode-option">
+          <input type="radio" name="mode" value="score">
+          <span>移調した楽譜を作り直す(読み取りミスが出やすい)</span>
+        </label>
+      </div>
+
       <div id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="楽譜の写真を選択">
         <div class="drop-zone-inner">
           <div class="drop-icon">📷</div>
@@ -95,6 +107,12 @@
       <div id="score-info" class="score-info"></div>
       <div id="score-container" class="score-container"></div>
       <div id="doremi-container" class="doremi-container" hidden></div>
+      <div id="overlay-wrap" class="overlay-wrap" hidden>
+        <canvas id="overlay-canvas"></canvas>
+        <div class="preview-actions">
+          <button id="download-btn" class="btn primary">📥 この画像を保存</button>
+        </div>
+      </div>
       <div id="warnings" class="warnings" hidden></div>
 
       <p class="note">※ AIによる読み取りのため、複雑な楽譜では音を間違えることがあります。「元の譜(認識結果)」タブで読み取り結果を確認できます。</p>

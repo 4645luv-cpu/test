@@ -151,6 +151,14 @@
     return { measures: out, fifths: newFifths, keyName: keyName(newFifths), shift, octaveAdjust };
   }
 
+  // 書かれた音名を shift 半音だけ移調したときのドレミ(オクターブは無関係)
+  function doremiForShift(pitch, shift, useSharps) {
+    const m = pitchToMidi(pitch);
+    if (m === null) return '';
+    const p = midiToPitch(m + shift, useSharps);
+    return doremi(p.letter, p.acc);
+  }
+
   function doremi(letter, acc) {
     let s = DOREMI[letter] || '';
     if (acc === '#') s += '♯';
@@ -173,5 +181,6 @@
     bestOctaveAdjust,
     transposeScore,
     doremi,
+    doremiForShift,
   };
 });

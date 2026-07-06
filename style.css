@@ -93,6 +93,45 @@ body {
 }
 .key-toggle:hover { color: var(--text); }
 
+/* 出力方法の選択 */
+.mode-select {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.mode-label { color: var(--muted); font-size: 0.8rem; }
+.mode-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 8px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.mode-option:has(input:checked) {
+  border-color: var(--accent);
+  background: rgba(245, 185, 66, 0.08);
+}
+.mode-option input {
+  margin-top: 3px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* 書き込み結果 */
+.overlay-wrap { text-align: center; }
+.overlay-wrap canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  background: #fff;
+}
+
 /* アップロード */
 .drop-zone {
   border: 2px dashed rgba(255, 255, 255, 0.25);
