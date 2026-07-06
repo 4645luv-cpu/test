@@ -7,12 +7,14 @@ const Anthropic = require('@anthropic-ai/sdk');
 
 const ALLOWED_MEDIA_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
+// 注意: 構造化出力のスキーマは型のユニオン(["string","null"])に対応していないため、
+// 「なし」は空文字列で表現する
 const SCHEMA = {
   type: 'object',
   properties: {
     isSheetMusic: { type: 'boolean' },
-    title: { type: ['string', 'null'] },
-    detectedInstrument: { type: ['string', 'null'] },
+    title: { type: 'string' },
+    detectedInstrument: { type: 'string' },
     sourceTransposition: { type: 'string', enum: ['C', 'Bb', 'Eb', 'F', 'unknown'] },
     clef: { type: 'string', enum: ['treble', 'bass'] },
     keyFifths: { type: 'integer' },
@@ -36,7 +38,7 @@ const SCHEMA = {
               type: 'object',
               properties: {
                 rest: { type: 'boolean' },
-                pitch: { type: ['string', 'null'] },
+                pitch: { type: 'string' },
                 duration: { type: 'string', enum: ['w', 'h', 'q', '8', '16', '32'] },
                 dotted: { type: 'boolean' },
               },
@@ -49,7 +51,7 @@ const SCHEMA = {
         additionalProperties: false,
       },
     },
-    warnings: { type: ['string', 'null'] },
+    warnings: { type: 'string' },
   },
   required: [
     'isSheetMusic', 'title', 'detectedInstrument', 'sourceTransposition',
@@ -65,16 +67,17 @@ const PROMPT = `この画像は楽譜の写真です。光学楽譜認識(OMR)�
 - pitch は「書かれている音」を科学的音名で表記する(例: "C4", "F#5", "Bb3")。中央ドは C4。
 - 調号による変化(例: ト長調のF→F#)と臨時記号を pitch に反映させること。臨時記号は同じ小節内の同じ音に引き続き適用される。
 - duration: 全音符=w, 2分=h, 4分=q, 8分=8, 16分=16, 32分=32。付点は dotted:true。
-- 休符は rest:true, pitch:null。
+- 休符は rest:true とし、pitch は空文字列 "" にする。
 - keyFifths は調号のシャープの数(フラットは負の数)。例: ハ長調=0, ト長調=1, ヘ長調=-1, 変ロ長調=-2。
-- detectedInstrument: 楽譜に楽器名の記載があればそのまま書く。なければ null。
+- title: 曲名の記載があればそのまま書く。なければ空文字列 ""。
+- detectedInstrument: 楽譜に楽器名の記載があればそのまま書く。なければ空文字列 ""。
 - sourceTransposition: 楽器名や文脈からこの譜が何管かを判断する。
   C管(ピアノ/フルート/バイオリン/オーボエ/歌など)="C"、B♭管(トランペット/クラリネット/テナーサックス/ソプラノサックス)="Bb"、
   E♭管(アルトサックス/バリトンサックス)="Eb"、F管(ホルン/イングリッシュホルン)="F"。判断材料がなければ "unknown"。
 - 複数の段がある場合はすべての段を順番に書き起こす(最大64小節まで)。
 - 歌詞・コード記号・強弱記号は無視してよい。
 - 楽譜が写っていない画像の場合は isSheetMusic:false とし、measures は空配列にする。
-- 読み取りに自信がない箇所があれば warnings に日本語で簡潔に書く。なければ null。`;
+- 読み取りに自信がない箇所があれば warnings に日本語で簡潔に書く。なければ空文字列 ""。`;
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
@@ -181,7 +184,12 @@ module.exports = async (req, res) => {
     } else if (err instanceof Anthropic.APIConnectionError) {
       res.status(502).json({ error: 'connection', message: 'AIサービスに接続できませんでした。もう一度お試しください。' });
     } else if (err instanceof Anthropic.APIError) {
-      res.status(502).json({ error: 'api_error', message: `解析中にエラーが発生しました (${err.status})。もう一度お試しください。` });
+      console.error('Anthropic API error', err.status, err.message);
+      const detail = String(err.message || '').slice(0, 300);
+      res.status(502).json({
+        error: 'api_error',
+        message: `解析中にエラーが発生しました (${err.status})。${detail ? `詳細: ${detail}` : 'もう一度お試しください。'}`,
+      });
     } else {
       console.error(err);
       res.status(500).json({ error: 'internal', message: '解析中にエラーが発生しました。もう一度お試しください。' });
